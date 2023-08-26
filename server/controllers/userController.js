@@ -35,7 +35,7 @@ export const registerController = async (req, res, next) => {
     if (existingUser) {
       return res
         .status(401)
-        .send({ success: false, message: "Email is already successfully" });
+        .json({ success: false, message: "Email is already successfully" });
     }
 
     //password bcrypt
@@ -47,7 +47,7 @@ export const registerController = async (req, res, next) => {
 
     return res
       .status(201)
-      .send({ success: true, message: "New user created successfully" });
+      .json({ success: true, message: "New user created successfully", user });
   } catch (error) {
     console.log(error);
 
@@ -88,6 +88,26 @@ export const updateUserController = async (req, res, next) => {
     return res
       .status(201)
       .send({ success: true, message: "update successfully" });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const deleteUserController = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    const user = await User.findByIdAndDelete(id);
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Something is wrong" });
+    }
+
+    return res
+      .status(201)
+      .json({ success: true, message: "User Delete successfully" });
   } catch (error) {
     return next(error);
   }
