@@ -55,6 +55,44 @@ export const registerController = async (req, res, next) => {
   }
 };
 
+export const updateUserController = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    const { name, email, password } = req.body;
+
+    if (
+      (!name && name.trim() === "") ||
+      (!email && email.trim() === "") ||
+      (!password && password.trim() === "")
+    ) {
+      return res
+        .status(404)
+        .send({ success: false, message: "Field the input" });
+    }
+
+    const passwordHashed = await bcrypt.hash(password, 10);
+
+    const user = await User.findByIdAndUpdate(id, {
+      name,
+      email,
+      password: passwordHashed,
+    });
+
+    if (!user) {
+      return res
+        .status(201)
+        .send({ success: false, message: "something is wrong" });
+    }
+
+    return res
+      .status(201)
+      .send({ success: true, message: "update successfully" });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const loginController = async (req, res, next) => {
   try {
     const { email, password } = req.body;
