@@ -1,5 +1,7 @@
 import User from "../models/User";
 
+import bcrypt from "bcrypt";
+
 export const getAllUser = async (req, res, next) => {
   let users;
   try {
@@ -28,7 +30,19 @@ export const registerController = async (req, res, next) => {
         .send({ success: false, message: "invalid Inputs" });
     }
 
-    const user = new User({ name, email, password });
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      return res
+        .status(401)
+        .send({ success: false, message: "Email is already successfully" });
+    }
+
+    //password bcrypt
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({ name, email, password: hashedPassword });
     await user.save();
 
     return res
@@ -37,6 +51,43 @@ export const registerController = async (req, res, next) => {
   } catch (error) {
     console.log(error);
 
+    return next(error);
+  }
+};
+
+export const loginController = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    if (
+      (!email && email.trim() === "") ||
+      (!password && password.trim() === "")
+    ) {
+      return res
+        .status(404)
+        .send({ success: false, message: "invalid inputs" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(404)
+        .send({ success: false, message: "email not found" });
+    }
+
+    const matchPassword = await bcrypt.compare(password, user.password);
+
+    if (!matchPassword) {
+      return res
+        .status(400)
+        .send({ success: false, message: "Password not match" });
+    }
+
+    return res
+      .status(201)
+      .send({ success: false, message: "Login Successfully" });
+  } catch (error) {
     return next(error);
   }
 };
