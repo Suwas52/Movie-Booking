@@ -64,3 +64,33 @@ export const addMoviesController = async (req, res, next) => {
     return next(error);
   }
 };
+
+export const allMoviesController = async (req, res, next) => {
+  try {
+    const allMovies = await Movies.find();
+    console.log(allMovies);
+
+    if (!allMovies) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Request Failed" });
+    }
+
+    return res.status(201).json({ allMovies });
+  } catch (error) {
+    console.log(error);
+    return next(error);
+  }
+};
+
+export const getMovieById = async (req, res, next) => {
+  const id = req.params.id;
+
+  const movie = await Movies.findById(id);
+
+  console.log(movie);
+
+  //   console.log(id);
+
+  return res.status(201).json({ movie });
+};

@@ -9,10 +9,12 @@ const moviesSchema = new mongoose.Schema(
     desc: { type: String, required: [true, "Description is required"] },
     releaseDate: { type: Date, required: [true, "Date is required"] },
     posterUrl: { type: String, required: [true, "Image Url is required"] },
-    actors: {
-      type: String,
-      required: [true, "Actor is required"],
-    },
+    actors: [
+      {
+        type: String,
+        required: [true, "Actor is required"],
+      },
+    ],
     featured: {
       Boolean,
     },
