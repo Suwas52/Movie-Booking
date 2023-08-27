@@ -44,3 +44,34 @@ export const addAdminController = async (req, res, next) => {
     return next(error);
   }
 };
+
+export const loginAdmin = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    const adminEmail = await Admin.findOne({ email });
+
+    if (!adminEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "This email is not register for admin",
+      });
+    }
+
+    const matchedPassword = await bcrypt.compare(password, adminEmail.password);
+
+    if (!matchedPassword) {
+      return res
+        .status(401)
+        .json({ success: false, message: "password is not matched" });
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: "Admin Login Successfully",
+      adminEmail,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
