@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import Admin from "../models/Admin";
 import bcrypt from "bcrypt";
 
@@ -66,10 +67,15 @@ export const loginAdmin = async (req, res, next) => {
         .json({ success: false, message: "password is not matched" });
     }
 
+    const token = jwt.sign({ id: adminEmail._id }, process.env.SECRET_KEY, {
+      expiresIn: "1d",
+    });
+
     return res.status(201).json({
       success: true,
       message: "Admin Login Successfully",
       adminEmail,
+      token,
     });
   } catch (error) {
     console.log(error);
