@@ -1,4 +1,7 @@
+import mongoose from "mongoose";
 import Booking from "../models/Booking";
+import Movies from "../models/Movies";
+import User from "../models/User";
 
 export const addMovieBooking = async (req, res, next) => {
   try {
@@ -10,14 +13,36 @@ export const addMovieBooking = async (req, res, next) => {
         .json({ success: false, message: "Invalid Booking " });
     }
 
-    const booking = await new Booking({
+    const booking = new Booking({
       movie,
       date: new Date(`${date}`),
       seatNumber,
       user,
     });
 
-    const bookingAdded = await booking.save();
+    const existingMovie = await Movies.findById(movie);
+    const existingUser = await User.findById(user);
+
+    if (!existingUser) {
+      return res
+        .status(401)
+        .json({ success: false, message: "User not found " });
+    }
+
+    if (!existingMovie) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Movie not found" });
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    existingMovie.bookings.push(booking);
+    existingUser.bookings.push(booking);
+    await existingMovie.save({ session });
+    await existingUser.save({ session });
+    const bookingAdded = await booking.save({ session });
+    await session.commitTransaction();
 
     if (!bookingAdded) {
       return res

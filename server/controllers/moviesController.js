@@ -41,7 +41,7 @@ export const addMoviesController = async (req, res, next) => {
         .json({ success: false, message: "Invalid Inputs" });
     }
 
-    const movie = new Movies({
+    const movie = await new Movies({
       title,
       desc,
       releaseDate: new Date(`${releaseDate}`),

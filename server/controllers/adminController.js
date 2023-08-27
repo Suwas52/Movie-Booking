@@ -46,6 +46,22 @@ export const addAdminController = async (req, res, next) => {
   }
 };
 
+export const getAllAdmin = async (req, res, next) => {
+  try {
+    const allAdmin = await Admin.find();
+
+    if (!allAdmin) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Failed to request" });
+    }
+
+    return res.status(201).json({ allAdmin });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const loginAdmin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
