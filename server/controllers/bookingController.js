@@ -57,3 +57,47 @@ export const addMovieBooking = async (req, res, next) => {
     return next(error);
   }
 };
+
+export const getAllBooking = async (req, res, next) => {
+  try {
+    const bookings = await Booking.find();
+
+    if (!bookings) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid request",
+      });
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: "All Booking Lists",
+      bookings,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getByIdBooking = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const booking = await Booking.findById(id);
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid request",
+      });
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: "Booking By Id",
+      booking,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
