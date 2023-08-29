@@ -101,3 +101,36 @@ export const getByIdBooking = async (req, res) => {
     return next(error);
   }
 };
+
+export const deleteByIdBooking = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    let booking;
+
+    booking = await Booking.findByIdAndRemove(id).populate("user movie");
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid request",
+      });
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    await booking.user.bookings.pull(booking);
+    await booking.movie.bookings.pull(booking);
+    await booking.movie.save({ session });
+    await booking.user.save({ session });
+    session.commitTransaction();
+
+    return res.status(201).json({
+      success: true,
+      message: "Booking Delete Successfully",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
