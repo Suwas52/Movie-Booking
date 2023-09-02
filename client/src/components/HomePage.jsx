@@ -1,8 +1,17 @@
 import { Box, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import MovieList from "./movies/MovieList";
+import { getAllMovies } from "../all-api/api-helper";
 
 const HomePage = () => {
+  const [movie, setMovie] = useState([]);
+
+  useEffect(() => {
+    getAllMovies()
+      .then((data) => setMovie(data.allMovies))
+      .catch((err) => console.log(err));
+  }, []);
+
   return (
     <Box width={"100%"} height={"100%"}>
       <Box width={"80%"} height={"40vh"} margin={"auto"} marginTop={2}>
@@ -20,10 +29,15 @@ const HomePage = () => {
           </Typography>
         </Box>
         <Box display="flex" justifyContent="center" flexWrap={"wrap"}>
-          <MovieList />
-          <MovieList />
-          <MovieList />
-          <MovieList />
+          {movie &&
+            movie.map((ele) => (
+              <MovieList
+                key={ele._id}
+                image={ele.posterUrl}
+                title={ele.title}
+                des={ele.desc}
+              />
+            ))}
         </Box>
       </Box>
     </Box>
