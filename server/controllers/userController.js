@@ -1,3 +1,4 @@
+import Admin from "../models/Admin";
 import User from "../models/User";
 
 import bcrypt from "bcrypt";
@@ -31,11 +32,12 @@ export const registerController = async (req, res, next) => {
     }
 
     const existingUser = await User.findOne({ email });
+    const existingAdmin = await Admin.findOne({ email });
 
-    if (existingUser) {
+    if (existingUser || existingAdmin) {
       return res
         .status(401)
-        .json({ success: false, message: "Email is already successfully" });
+        .json({ success: false, message: "Email is already register" });
     }
 
     //password bcrypt

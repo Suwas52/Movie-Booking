@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import Booking from "../models/Booking";
-import Movies from "../models/Movies";
+import Movie from "../models/Movie";
 import User from "../models/User";
 
 export const addMovieBooking = async (req, res, next) => {
@@ -20,7 +20,7 @@ export const addMovieBooking = async (req, res, next) => {
       user,
     });
 
-    const existingMovie = await Movies.findById(movie);
+    const existingMovie = await Movie.findById(movie);
     const existingUser = await User.findById(user);
 
     if (!existingUser) {
@@ -103,34 +103,48 @@ export const getByIdBooking = async (req, res) => {
 };
 
 export const deleteByIdBooking = async (req, res, next) => {
+  const bookingId = req.params.id;
+
   try {
-    const id = req.params.id;
-
-    let booking;
-
-    booking = await Booking.findByIdAndRemove(id).populate("user movie");
+    // Find the booking by its ID
+    const booking = await Booking.findByIdAndDelete(bookingId);
 
     if (!booking) {
       return res.status(404).json({
         success: false,
-        message: "Invalid request",
+        message: "Booking not found",
+      });
+    }
+
+    // Fetch the user by their ID
+
+    const userId = booking.user;
+    const movieId = booking.movie;
+    const user = await User.findById(userId);
+    const movie = await Movie.findById(movieId);
+
+    if (!user || !movie) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
       });
     }
 
     const session = await mongoose.startSession();
     session.startTransaction();
 
-    await booking.user.bookings.pull(booking);
-    await booking.movie.bookings.pull(booking);
-    await booking.movie.save({ session });
-    await booking.user.save({ session });
+    await user.bookings.pull(bookingId);
+    await movie.bookings.pull(bookingId);
+    await user.save({ session });
+    await movie.save({ session });
     session.commitTransaction();
 
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
-      message: "Booking Delete Successfully",
+      message: "Booking deleted successfully",
     });
   } catch (error) {
+    console.error("Error in deleteByIdBooking:", error);
     return next(error);
   }
 };

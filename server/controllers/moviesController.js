@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import Movies from "../models/Movies";
+import Movie from "../models/Movie";
 import mongoose from "mongoose";
 import Admin from "../models/Admin";
 export const addMoviesController = async (req, res, next) => {
@@ -41,7 +41,7 @@ export const addMoviesController = async (req, res, next) => {
         .json({ success: false, message: "Invalid Inputs" });
     }
 
-    const movie = await new Movies({
+    const movie = await new Movie({
       title,
       desc,
       releaseDate: new Date(`${releaseDate}`),
@@ -76,7 +76,7 @@ export const addMoviesController = async (req, res, next) => {
 
 export const allMoviesController = async (req, res, next) => {
   try {
-    const allMovies = await Movies.find();
+    const allMovies = await Movie.find();
     console.log(allMovies);
 
     if (!allMovies) {
@@ -95,7 +95,7 @@ export const allMoviesController = async (req, res, next) => {
 export const getMovieById = async (req, res, next) => {
   const id = req.params.id;
 
-  const movie = await Movies.findById(id);
+  const movie = await Movie.findById(id);
 
   console.log(movie);
 

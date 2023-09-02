@@ -35,4 +35,4 @@ const moviesSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Movies", moviesSchema);
+export default mongoose.model("Movie", moviesSchema);
