@@ -1,4 +1,5 @@
 import Admin from "../models/Admin";
+import Booking from "../models/Booking";
 import User from "../models/User";
 
 import bcrypt from "bcrypt";
@@ -148,6 +149,27 @@ export const loginController = async (req, res, next) => {
       .status(201)
       .send({ success: false, message: "Login Successfully" });
   } catch (error) {
+    return next(error);
+  }
+};
+
+export const bookingByUserId = async (req, res, next) => {
+  const id = req.params.id;
+
+  try {
+    const bookings = await Booking.find({ user: id });
+
+    if (!bookings) {
+      return res
+        .status(404)
+        .json({ success: false, message: "booking not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, message: "User By Booking ", bookings });
+  } catch (error) {
+    console.log(error);
     return next(error);
   }
 };

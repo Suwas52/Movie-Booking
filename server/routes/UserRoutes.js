@@ -5,6 +5,7 @@ import {
   loginController,
   updateUserController,
   deleteUserController,
+  bookingByUserId,
 } from "../controllers/userController";
 
 const userRouter = express.Router();
@@ -18,5 +19,7 @@ userRouter.put("/update-user/:id", updateUserController);
 userRouter.delete("/delete-user/:id", deleteUserController);
 
 userRouter.post("/login", loginController);
+
+userRouter.get("/booking/:id", bookingByUserId);
 
 export default userRouter;
